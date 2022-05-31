@@ -40,6 +40,9 @@ const Message = conn.define('message', {
     },
 });
 
+Message.belongsTo(User, {as: 'from'});
+Message.belongsTo(User, {as: 'to'});
+
 const syncAndSeed = async() => {
     await conn.sync({ force: true });
     const [ moe, larry, lucy, ethyl ] = await Promise.all(
@@ -52,9 +55,9 @@ const syncAndSeed = async() => {
     );
     const [ hi, bye, hello ] = await Promise.all(
         [
-            { subject: 'hi' },
-            { subject: 'bye' },
-            { subject: 'hello' },
+            { subject: 'hi', fromId: moe.id, toId: lucy.id },
+            { subject: 'bye', fromId: lucy.id, toId: moe.id },
+            { subject: 'hello', fromId: ethyl.id, toId: larry.id },
         ].map( message => Message.create(message))
     );
 }
